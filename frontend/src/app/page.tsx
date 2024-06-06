@@ -22,6 +22,7 @@ export default function Home() {
   const getCurrentUser = useCallback(async () => {
     if (userId) {
       const res = await UserApi.getCurrentUser();
+      console.log('res', res);
       setUser(res);
     } else {
       router.push("/login");

@@ -26,14 +26,14 @@ export enum PARTICIPANT_STATUS {
 }
 
 export interface CurrentUser {
-  userId: string;
+  id: string;
   username: string;
   email: string;
 }
 
 export interface RoomHistory {
-  id: number;
-  name: string;
+  roomId: number;
+  roomName: string;
   createdAt: Date;
   votingSystem: VOTING_SYSTEM;
   userStories: UserStory[];

@@ -26,7 +26,5 @@ namespace PlanningPoker.Services.UserStoryService
         Task<string> EstimateTaskValue(int userStoryTaskId, IList<VotingResults> votingResults, VotingSystem votingSystem);
         Task<UserStoryTask?> GetUserStoryTaskById(int userStoryTaskId);
 
-        Task<UserStoryTask?> GetCurrentVotingTask();
-        Task SetCurrentEvaluatedTask(int userStoryTaskId);
     }
 }

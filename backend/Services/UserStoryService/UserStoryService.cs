@@ -365,29 +365,5 @@ namespace PlanningPoker.Services.UserStoryService
             return string.Empty;
         }
 
-
-        public async Task<UserStoryTask?> GetCurrentVotingTask()
-        {
-            return await _dbContext.UserStoryTasks.FirstOrDefaultAsync(t => t.CurrentlyEvaluated);
-        }
-
-        public async Task SetCurrentEvaluatedTask(int userStoryTaskId)
-        {
-            var tasksToReset = await _dbContext.UserStoryTasks.Where(t => t.CurrentlyEvaluated).ToListAsync();
-
-            foreach (var task in tasksToReset)
-            {
-                task.CurrentlyEvaluated = false;
-            }
-
-            var newTask = await _dbContext.UserStoryTasks.FindAsync(userStoryTaskId);
-
-            if (newTask == null)
-                throw new Exception("No task with given ID");
-
-            newTask.CurrentlyEvaluated = true;
-
-            await _dbContext.SaveChangesAsync();
-        }
     }
 }

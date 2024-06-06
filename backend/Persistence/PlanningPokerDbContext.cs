@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PlanningPoker.Models.Participants;
 using PlanningPoker.Models.Rooms;
+using PlanningPoker.Models.Users;
 using PlanningPoker.Models.UserStory;
 
 namespace PlanningPoker.Persistence
@@ -10,6 +11,7 @@ namespace PlanningPoker.Persistence
     {
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Participant> Participants { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<UserStory> UserStories { get; set; }
         public DbSet<UserStoryTask> UserStoryTasks { get; set; }
 

@@ -1,6 +1,5 @@
 ﻿using PlanningPoker.Models.Participants;
 using PlanningPoker.Models.Rooms;
-using PlanningPoker.Models.UserStory;
 
 namespace PlanningPoker.Services.RoomService
 {

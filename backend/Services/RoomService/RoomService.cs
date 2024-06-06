@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PlanningPoker.Models.Participants;
 using PlanningPoker.Models.Rooms;
-using PlanningPoker.Models.UserStory;
 using PlanningPoker.Persistence;
 using PlanningPoker.Services.ParticipantService;
 using PlanningPoker.Services.UserStoryService;

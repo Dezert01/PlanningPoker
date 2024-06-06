@@ -5,8 +5,9 @@ import { currentUserHistory, currentUserRes } from "@/api-mock-data/auth-data";
 export namespace UserApi {
   export const getCurrentUser = async () => {
     const userId = localStorage.getItem("userId");
-    // const res = await api.get<CurrentUser>(`user/${userId}`);
-    const res = { data: currentUserRes };
+    const res = await api.get<CurrentUser>(`user/${userId}`);
+    console.log(res);
+    // const res = { data: currentUserRes };
     return res.data;
   };
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PlanningPoker.Persistence;
@@ -11,9 +12,11 @@ using PlanningPoker.Persistence;
 namespace PlanningPoker.Migrations
 {
     [DbContext(typeof(PlanningPokerDbContext))]
-    partial class PlanningPokerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240606181717_Revert")]
+    partial class Revert
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,31 +139,6 @@ namespace PlanningPoker.Migrations
                     b.HasIndex("UserStoryId");
 
                     b.ToTable("UserStoryTasks");
-                });
-
-            modelBuilder.Entity("PlanningPoker.Models.Users.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("PlanningPoker.Models.Participants.Participant", b =>
