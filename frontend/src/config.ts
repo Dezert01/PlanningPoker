@@ -9,8 +9,8 @@ const defaultConfig = {
 const configs = {
   local: {
     ...defaultConfig,
-    baseUrl: "http://192.168.1.24:3071",
-    websocketUrl: "http://192.168.1.24:3071",
+    baseUrl: "https://backendinf1337.azurewebsites.net",
+    websocketUrl: "https://backendinf1337.azurewebsites.net",
     sentryDsn: "",
     googleApiKey: "",
   },

@@ -1,5 +1,6 @@
 import { UserStory } from "@/model/userstory";
 import { api } from "./client";
+import { config } from "@/config";
 
 export namespace UserStoryApi {
 
@@ -27,7 +28,7 @@ export namespace UserStoryApi {
       body: formData
     };
 
-    const result = await fetch(`https://localhost:7008/api/user-stories/import/${roomId}`, requestOptions);
+    const result = await fetch(`${config.baseUrl}/api/user-stories/import/${roomId}`, requestOptions);
 
     if (result.ok) {
       return 'Import successful';

@@ -24,6 +24,7 @@ import { UserStory, UserStoryTask } from "@/model/userstory";
 import { useQueryClient } from "@tanstack/react-query";
 import { addListItem } from "@/queries/query.utils";
 import { userStoryKeys } from "@/queries/userstory.queries";
+import { config } from "@/config";
 
 export default function Room({
   params,
@@ -38,8 +39,8 @@ export default function Room({
   const [userNickname, setUserNickname] = useState<string | null>(null);
   const [connection, setConnection] = useState(() =>
     new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7008/roomHub")
-      .build()
+      .withUrl(`${config.baseUrl}/roomHub`)
+      .build(),
   );
 
   const [gameState, setGameState] = useState<string>("");
@@ -50,7 +51,7 @@ export default function Room({
 
   const [votedTask, setVotedTask] = useState<UserStoryTask | null>(null);
   const [votedTaskEstimation, setVotedTaskEstimation] = useState<string | null>(
-    null
+    null,
   );
 
   const router = useRouter();
@@ -66,17 +67,13 @@ export default function Room({
 
   const handleSetNickname = (nickname: string) => {
     setUserNickname(nickname);
+    if (userNickname) {
+      joinRoomMutation.mutate({
+        roomId: roomId,
+        nickname: userNickname,
+      });
+    }
   };
-
-  useEffect(() => {
-    if (!userNickname) return;
-    joinRoomMutation.mutate({
-      roomId: roomId,
-      nickname: userNickname,
-    });
-
-    console.log(connection);
-  }, [connection, joinRoomMutation, roomId, userNickname]);
 
   const startConnection = useCallback(async () => {
     if (!userNickname) return;
@@ -227,7 +224,7 @@ export default function Room({
           .stop()
           .then(() => console.log("SignalR connection stopped"))
           .catch((error) =>
-            console.error("Error stopping SignalR connection:", error)
+            console.error("Error stopping SignalR connection:", error),
           );
       }
     };
@@ -243,7 +240,7 @@ export default function Room({
       roomId,
       userNickname,
       value,
-      votedTask?.id
+      votedTask?.id,
     );
   };
 
@@ -262,7 +259,7 @@ export default function Room({
   const updateUserStoryHandle = async (
     userStoryId: number,
     title: string,
-    description: string
+    description: string,
   ) => {
     if (!connection) return;
     await connection
@@ -270,7 +267,7 @@ export default function Room({
       .then(() =>
         queryClient.invalidateQueries({
           queryKey: userStoryKeys.userStories(roomId),
-        })
+        }),
       );
   };
 
@@ -279,14 +276,14 @@ export default function Room({
     await connection.invoke("DeleteUserStory", roomId, userStoryId).then(() =>
       queryClient.invalidateQueries({
         queryKey: userStoryKeys.userStories(roomId),
-      })
+      }),
     );
   };
 
   const createUserStoryTaskHandle = async (
     userStoryId: number,
     title: string,
-    description: string
+    description: string,
   ) => {
     if (!connection) return;
     await connection.invoke(
@@ -294,14 +291,14 @@ export default function Room({
       roomId,
       userStoryId,
       title,
-      description
+      description,
     );
   };
 
   const updateUserStoryTaskHandle = async (
     userStoryTaskId: number,
     title: string,
-    description: string
+    description: string,
   ) => {
     if (!connection) return;
     await connection.invoke(
@@ -309,7 +306,7 @@ export default function Room({
       roomId,
       userStoryTaskId,
       title,
-      description
+      description,
     );
   };
 
