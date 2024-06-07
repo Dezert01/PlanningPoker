@@ -47,19 +47,6 @@ namespace PlanningPoker.SignalR.Hubs
 
             var votingState = _roomService.GetVotingState(room);
             await Clients.Group(groupName).SendAsync("VotingState", votingState);
-
-            //await GetCurrentVotingTask(groupName);
-        }
-
-        private async Task GetCurrentVotingTask(string groupName)
-        {
-            var userStoryTask = await _userStoryService.GetCurrentVotingTask();
-
-            if (userStoryTask == null)
-                return;
-
-            await Clients.Caller.SendAsync("VotingStart", userStoryTask);
-            await Clients.Group(groupName).SendAsync("TaskEstimation", null);
         }
 
         public async Task SubmitVote(int roomId, string participantName, string? voteValue, int userStoryTaskId)
@@ -225,9 +212,6 @@ namespace PlanningPoker.SignalR.Hubs
 
             if (userStoryTask == null)
                 throw new Exception("No task with given ID");
-
-            // Note: For users that joined during vote
-            //await _userStoryService.SetCurrentEvaluatedTask(userStoryTaskId);
 
             var groupName = GetGroupName(room);
 

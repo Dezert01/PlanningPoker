@@ -3,7 +3,7 @@ using PlanningPoker.Services.UserStoryService;
 
 namespace PlanningPoker.Controllers
 {
-    [Route("api/userStories")]
+    [Route("api/user-stories")]
     [ApiController]
     public class UserStoryApiController : ControllerBase
     {
