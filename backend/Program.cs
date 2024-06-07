@@ -19,7 +19,7 @@ namespace PlanningPoker
                 options.AddPolicy(name: myAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins("https://planningpokerinf1337.vercel.app")
+                        policy.WithOrigins("https://planningpokerinf1337.vercel.app", "https://planningpokerinf1337.vercel.app/room")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();
@@ -47,8 +47,8 @@ namespace PlanningPoker
             }
             catch (Exception ex)
             {
-            // Handle connection error here (e.g., log the exception)
-            Console.WriteLine("Error connecting to database:", ex.Message);
+                // Handle connection error here (e.g., log the exception)
+                Console.WriteLine("Error connecting to database:", ex.Message);
             }
 
             builder.Services.AddSignalR();
