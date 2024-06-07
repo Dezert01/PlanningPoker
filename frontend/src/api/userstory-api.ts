@@ -5,17 +5,17 @@ import { config } from "@/config";
 export namespace UserStoryApi {
 
   export const listUserStories = async (roomId: number) => {
-    const result = await api.get<UserStory[]>(`/user-stories/${roomId}`);
+    const result = await api.get<UserStory[]>(`/userStories/${roomId}`);
     return result.data;
   };
 
   export const getUserStoryDetails = async (userStoryId: number) => {
-    const result = await api.get<UserStory>(`/user-stories/details/${userStoryId}`);
+    const result = await api.get<UserStory>(`/userStories/details/${userStoryId}`);
     return result.data;
   }
 
   export const exportUserStories = async (roomId: number) => {
-    const result = await api.get(`/user-stories/export/${roomId}`);
+    const result = await api.get(`/userStories/export/${roomId}`);
     return result.data;
   }
 
@@ -28,7 +28,7 @@ export namespace UserStoryApi {
       body: formData
     };
 
-    const result = await fetch(`${config.baseUrl}/api/user-stories/import/${roomId}`, requestOptions);
+    const result = await fetch(`${config.baseUrl}/api/userStories/import/${roomId}`, requestOptions);
 
     if (result.ok) {
       return 'Import successful';
