@@ -11,6 +11,7 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
   timeout: APP_TIMEOUT,
+  withCredentials: true,
 });
 
 curlirize(api);
