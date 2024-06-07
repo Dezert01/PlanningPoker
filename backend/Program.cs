@@ -19,8 +19,7 @@ namespace PlanningPoker
                 options.AddPolicy(name: myAllowSpecificOrigins,
                     policy =>
                     {
-                        policy
-                            .AllowAnyOrigin()
+                        policy.WithOrigins("https://planningpokerinf1337.vercel.app/")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();
