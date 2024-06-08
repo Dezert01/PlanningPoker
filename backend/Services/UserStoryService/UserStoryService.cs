@@ -281,7 +281,10 @@ namespace PlanningPoker.Services.UserStoryService
                             RoomId = roomId
                         };
 
-                        await AddUserStory(newUserStory);
+                        var insert = await AddUserStory(newUserStory);
+
+                        if (!insert)
+                            continue;
 
                         if (string.IsNullOrWhiteSpace(parts[2]))
                             continue;
