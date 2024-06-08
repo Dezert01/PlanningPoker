@@ -11,4 +11,10 @@ export interface Room {
   gameState: RoomGameState;
 }
 
+export type TParticipant = {
+  name: string;
+  value: boolean | string;
+};
+
+
 export type RoomGameState = 'GameReady' | 'VoteInProgress' | 'VoteFinished';

@@ -5,12 +5,10 @@ import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/stores/user-store";
 import { useEffect, useCallback } from "react";
 import { UserApi } from "@/api/user-api";
-import { useRouter } from "next/navigation";
 import { useUserHistoryQuery } from "@/queries/user.queries";
 import { HistoryDialog } from "./hisotryDialog";
 
 export default function Home() {
-  const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
   const user = useUserStore((state) => state.user);
   let userId = null;
@@ -42,14 +40,13 @@ export default function Home() {
           <Button>Create new room</Button>
         </Link>
       </div>
-      {userId && (
-         <div className="w-full mt-48">
+        <div className="w-full mt-48">
          {!isLoading && !isError && <h1 className="mb-4 text-center">
            {user?.username} history of the estimation sessions
          </h1>}
-         {isLoading ? <h1 className="text-center text-xl text-white/70">Loading...</h1> : 
-         isError ? <h1 className="text-center text-xl text-red">Error: {error.message}</h1> :
-         (!data) ? <h1 className="text-center text-xl text-white/70">User history is empty</h1> :
+         {isLoading ? <h1 className="text-center text-xl text-white/70">{"Loading..."}</h1> : 
+         isError ? <h1 className="text-center text-xl text-red">{userId ? `Error: ${error.message}` : "Guest users don't have estimations history"}</h1> :
+         (!data) ? <h1 className="text-center text-xl text-white/70">{userId ? "User history is empty" : "Guest users don't have estimations history"}</h1> :
          data.map((userHistory) => (
            <div className="w-full flex-row pb-8" key={userHistory.roomId}>
              <h2>{userHistory.roomName}</h2>
@@ -86,8 +83,6 @@ export default function Home() {
            </div>
          ))}
        </div>
-      )}
-     
     </>
   );
 }

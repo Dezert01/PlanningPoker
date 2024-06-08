@@ -7,17 +7,10 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { UserStory, UserStoryTask } from "@/model/userstory";
-
-import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import UsTask from "./room/[roomId]/userStories/usTask";
-import { useQueryClient } from "@tanstack/react-query";
-import { userStoryKeys } from "@/queries/userstory.queries";
-import { UserHistory } from "@/model/user";
 
 type Props = {
   data: UserStory;

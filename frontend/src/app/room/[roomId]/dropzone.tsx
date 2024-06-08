@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Dropzone from "react-dropzone";
 import Papa from "papaparse";
-import { Modal, Table, Checkbox } from "antd";
+import { Modal, Table } from "antd";
 import { UserStoryApi } from "@/api/userstory-api";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,33 +12,30 @@ const DropzoneComponent: React.FC = () => {
   const queryClient = useQueryClient();
   const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
   const [wrongFileFormatProvided, setwrongFileFormatProvided] = useState(false);
-  const [csvData, setCsvData] = useState<any[]>([]); // State to store CSV data
+  const [csvData, setCsvData] = useState<any[]>([]); 
   const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [modalVisible, setModalVisible] = useState(false); // State to manage modal visibility
+  const [modalVisible, setModalVisible] = useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
 
   const handleFileDrop = (acceptedFiles: any[]) => {
     const selectedFile = acceptedFiles[0];
 
-    // 1. Basic validation
     if (selectedFile.type === "text/csv") {
       console.log("Uploaded file:", selectedFile);
       setIsUploadSuccessful(true);
       setwrongFileFormatProvided(false);
 
-      // Parse the CSV file using PapaParse
       Papa.parse(selectedFile, {
         complete: (results) => {
           const parsedData = results.data;
           console.log("Parsed CSV data:", parsedData);
-          setCsvData(parsedData); // Store CSV data in state
+          setCsvData(parsedData);
           showModal();
         },
       });
 
       setCsvFile(selectedFile);
     } else {
-      // Not a CSV file
       setIsUploadSuccessful(false);
       setwrongFileFormatProvided(true);
     }
@@ -46,52 +43,44 @@ const DropzoneComponent: React.FC = () => {
 
   const showModal = () => {
     setModalVisible(true);
-    // Calculate table width and set modal width (when modal opens)
     if (tableRef.current) {
       const tableWidth = tableRef.current.offsetWidth;
-      setModalWidth(tableWidth); // Update modal state (optional)
+      setModalWidth(tableWidth);
     }
   };
 
   const importUserStories = async () => {
-    // Extract room ID from URL (assuming URL format is consistent)
     const url = window.location.href;
     const roomIdMatch = url.match(/\/room\/(\d+)/);
-    const roomId = roomIdMatch ? parseInt(roomIdMatch[1]) : null; // Parse as integer
+    const roomId = roomIdMatch ? parseInt(roomIdMatch[1]) : null;
     if (roomId && csvFile != null) {
       const result = await UserStoryApi.importUserStories(roomId, csvFile);
       console.log(result);
     } else {
       console.error("Error: Could not extract room ID from URL");
     }
-    setTimeout(() => {
-      queryClient.invalidateQueries({
-        queryKey: userStoryKeys.userStory(roomId!),
-      });
-    }, 500);
+    queryClient.invalidateQueries({
+      queryKey: userStoryKeys.userStories(roomId!),
+    });
   };
 
   const exportUserStories = async () => {
-    // Extract room ID from URL (assuming consistent format)
     const url = window.location.href;
     const roomIdMatch = url.match(/\/room\/(\d+)/);
     const roomId = roomIdMatch ? parseInt(roomIdMatch[1]) : null;
 
     if (!roomId) {
       console.error("Error: Could not extract room ID from URL");
-      return; // Exit if room ID cannot be found
+      return;
     }
 
     try {
       const result = UserStoryApi.exportUserStories(roomId);
-      // Prepare the CSV data
       const csvContent =
         "data:text/csv;charset=utf-8," + encodeURIComponent(await result);
 
-      // Create a downloadable blob
       const blob = new Blob([await result], { type: "text/csv;charset=utf-8" });
 
-      // Simulate a click on a hidden anchor tag to trigger download
       const downloadLink = document.createElement("a");
       downloadLink.href = csvContent;
       downloadLink.download = `user_stories_${roomId}.csv`;
@@ -103,7 +92,6 @@ const DropzoneComponent: React.FC = () => {
       console.log("User stories exported successfully!");
     } catch (error) {
       console.error("Error exporting user stories:", error);
-      // Handle errors appropriately (e.g., display error message to user)
     }
   };
 
@@ -113,17 +101,15 @@ const DropzoneComponent: React.FC = () => {
     setModalVisible(false);
   };
 
-  // Define table columns based on CSV data structure
   const tableColumns = csvData[0]
     ? csvData[0].slice(0).map((header: any, index: string | number) => {
-        // Check if data is objects with matching properties
         const dataIndex =
           csvData[1] && csvData[1][index] !== undefined ? header : index;
 
         return {
           title: header,
           dataIndex,
-          key: index, // Ensure unique keys
+          key: index,
         };
       })
     : [];
@@ -175,6 +161,7 @@ const DropzoneComponent: React.FC = () => {
           </section>
         )}
       </Dropzone>
+      <div className="flex flex-row justify-between mt-4">
       <Button onClick={showModal} disabled={!isUploadSuccessful}>
         View CSV Data
       </Button>
@@ -182,6 +169,7 @@ const DropzoneComponent: React.FC = () => {
         Import
       </Button>
       <Button onClick={exportUserStories}>Export</Button>
+      </div>
       <Modal
         title="CSV Data"
         open={modalVisible}
@@ -194,7 +182,7 @@ const DropzoneComponent: React.FC = () => {
             Confirm
           </Button>,
         ]}
-        width={modalWidth || "auto"} // Use modal state or 'auto'
+        width={modalWidth || "auto"}
       >
         <div ref={tableRef}>
           <Table

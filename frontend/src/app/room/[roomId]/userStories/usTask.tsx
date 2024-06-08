@@ -68,8 +68,12 @@ const UsTask: React.FC<Props> = ({
                   size="action"
                   variant="destructive"
                   onClick={() =>
-                    deleteUserStoryTaskHandle &&
-                    deleteUserStoryTaskHandle(data.id)
+                    {
+                      if (window.confirm("Are you sure you want to delete this?")) {
+                        deleteUserStoryTaskHandle &&
+                        deleteUserStoryTaskHandle(data.id)
+                      }
+                    }
                   }
                 >
                   <Trash2 />
@@ -80,8 +84,8 @@ const UsTask: React.FC<Props> = ({
               </>
             ) : null}
           </div>
-        ) : data.votingResult ? (
-          <p className="font-semibold">Voting result: {data.votingResult}</p>
+        ) : data.estimationResult ? (
+          <p className="font-semibold">Voting result: {data.estimationResult}</p>
         ) : (
           <Button
             size="sm"

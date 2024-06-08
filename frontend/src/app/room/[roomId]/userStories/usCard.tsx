@@ -1,7 +1,6 @@
 import { UserStory, UserStoryTask } from "@/model/userstory";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import UsCardDialog from "./usCardDialog";
+
 type Props = {
   data: UserStory;
   roomId: number;
@@ -35,10 +34,11 @@ const UsCard: React.FC<Props> = ({
   updateUserStoryTaskHandle,
   setVotedTaskHandle,
 }) => {
+
+
   return (
     <div className="w-full max-w-sm rounded-sm border-2 border-white bg-background2 p-4 text-white">
       <p>{data.title}</p>
-      {/* <Button size="sm">Show Details</Button> */}
       <UsCardDialog
         data={data}
         roomId={roomId}
