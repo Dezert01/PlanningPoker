@@ -21,6 +21,7 @@
 
             var estimationResult = properties[2];
             EstimationResult = string.IsNullOrWhiteSpace(estimationResult) ? string.Empty : estimationResult;
+            VotersIds = new List<int>();
         }
 
         public int Id { get; set; }
