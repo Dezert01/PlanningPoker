@@ -272,12 +272,13 @@ namespace PlanningPoker.SignalR.Hubs
         private async Task ResetPlayerVotes(Room room)
         {
             var groupName = GetGroupName(room);
-            var votingState = _roomService.GetVotingState(room);
 
             foreach (var participant in room.Participants)
             {
                 await _participantService.SubmitVote(participant.Name, participant.ConnectionId, null);
             }
+
+            var votingState = _roomService.GetVotingState(room);
 
             await Clients.Group(groupName).SendAsync("VotingState", votingState);
 
