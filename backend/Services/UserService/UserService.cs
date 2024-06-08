@@ -149,6 +149,7 @@ namespace PlanningPoker.Services.UserService
                 userHistories.Add(new UserHistory
                 {
                     RoomId = room.Id,
+                    RoomCreatedAt = room.CreatedAt,
                     RoomName = room.Name,
                     RoomVotingSystem = room.VotingSystem.ToString(),
                     RoomUserStories = userStoryHistories

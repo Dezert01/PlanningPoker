@@ -33,6 +33,7 @@ export interface CurrentUser {
 
 export interface UserHistory {
   roomId: number;
+  roomCreatedAt: Date;
   roomName: string;
   roomVotingSystem: VOTING_SYSTEM;
   userStories: UserStory[];

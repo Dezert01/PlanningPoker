@@ -21,10 +21,10 @@ export const currentUserRes = {
 
 export const currentUserHistory: UserHistory[] = [
   {
-    createdAt: new Date(),
-    id: 1,
-    name: "Room 1",
-    votingSystem: VOTING_SYSTEM.FIBONACCI,
+    roomCreatedAt: new Date(),
+    roomId: 1,
+    roomName: "Room 1",
+    roomVotingSystem: VOTING_SYSTEM.FIBONACCI,
     userStories: [
       {
         description: "User story description",
@@ -154,10 +154,10 @@ export const currentUserHistory: UserHistory[] = [
     ],
   },
   {
-    createdAt: new Date(),
-    id: 2,
-    name: "Room 2",
-    votingSystem: VOTING_SYSTEM.FIBONACCI,
+    roomCreatedAt: new Date(),
+    roomId: 2,
+    roomName: "Room 2",
+    roomVotingSystem: VOTING_SYSTEM.FIBONACCI,
     userStories: [
       {
         description: "User story description",
