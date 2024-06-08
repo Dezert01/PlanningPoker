@@ -8,6 +8,7 @@
             Title = title;
             Description = description;
             EstimationResult = string.Empty;
+            VotersIds = new List<int>();
         }
 
         public UserStoryTask(int userStoryId, string csvTask)
