@@ -6,11 +6,12 @@ import DeckCard from "./deckCard";
 type Props = {
   votingSystem: VOTING_SYSTEM;
   submitVoteHandle: (value: string | null) => void;
+  currentChoice: string | null;
+  setCurrentChoice: (value: string | null) => void;
 };
 
-const Deck: React.FC<Props> = ({ votingSystem, submitVoteHandle }) => {
+const Deck: React.FC<Props> = ({ votingSystem, submitVoteHandle, currentChoice, setCurrentChoice }) => {
   const [deck, setDeck] = useState<string[]>([]);
-  const [currentChoice, setCurrentChoice] = useState<string | null>(null);
 
   const handleCardPress = (card: string) => {
     if (card === currentChoice) {

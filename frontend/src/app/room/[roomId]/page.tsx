@@ -44,7 +44,7 @@ export default function Room({
       .build(),
   );
 
-  const [gameState, setGameState] = useState<RoomGameState>('GameReady');
+  const [gameState, setGameState] = useState<RoomGameState>("GameReady");
   const [readyToFinish, setReadyToFinish] = useState(false);
 
   // TODO: filter participants - wywalić siebie jesli jest przekazywany
@@ -55,6 +55,7 @@ export default function Room({
   const [votedTaskEstimation, setVotedTaskEstimation] = useState<string | null>(
     null,
   );
+  const [currentChoice, setCurrentChoice] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -96,7 +97,9 @@ export default function Room({
       });
 
       connection.on("ParticipantName", async (participantName) => {
+        console.log("participantName:", participantName);
         setUserNickname(participantName);
+        // handleSetNickname(participantName);
       });
 
       connection.on("UserLeft", async (participantName) => {
@@ -120,9 +123,14 @@ export default function Room({
         setReadyToFinish(bool);
       });
 
-      connection.on("VotingState", async (votingState) => {
+      connection.on("VotingState", async (votingState: TParticipant[]) => {
         console.log("votingstate:", votingState);
         setParticipants(votingState);
+        const value = votingState.find((el) => el.name === userNickname)?.value;
+        console.log(value);
+        if (!value) {
+          setCurrentChoice(null);
+        }
         console.log("connection:", connection);
       });
 
@@ -199,7 +207,11 @@ export default function Room({
       await connection.start();
 
       const userId = localStorage.getItem("userId");
-      await connection.invoke("JoinRoom", roomId, !!userId ? Number(userId) : null);
+      await connection.invoke(
+        "JoinRoom",
+        roomId,
+        !!userId ? Number(userId) : null,
+      );
     } catch (error) {
       console.error("SignalR Connection Error:", error);
     }
@@ -253,6 +265,7 @@ export default function Room({
   const submitVoteHandle = async (value: string | null) => {
     if (!connection) return;
     console.log(value, connection.state);
+    console.log(userNickname);
     await connection.invoke(
       "SubmitVote",
       roomId,
@@ -419,10 +432,12 @@ export default function Room({
         )}
       </div>
 
-      {votedTask !== null && gameState !== 'VoteFinished' && (
+      {votedTask !== null && gameState !== "VoteFinished" && (
         <div>
           <h2>Your deck</h2>
           <Deck
+            currentChoice={currentChoice}
+            setCurrentChoice={setCurrentChoice}
             votingSystem={data.votingSystem}
             submitVoteHandle={submitVoteHandle}
           />
