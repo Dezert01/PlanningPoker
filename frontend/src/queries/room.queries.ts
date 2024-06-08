@@ -38,32 +38,3 @@ export function useCreateRoomMutation(options: {
   });
   return mutation;
 }
-
-export function useJoinRoomMutation(options: {
-  onSuccess?: () => void;
-  onError?: () => void;
-}) {
-  const mutation = useMutation({
-    mutationFn: RoomApi.joinRoom,
-    onSuccess: () => {
-      options.onSuccess?.();
-    },
-    onError: () => {
-      options.onError?.();
-    },
-  });
-  return mutation;
-}
-
-export function useLeaveRoomMutation(options: {
-  onSuccess?: () => void;
-  onError?: () => void;
-}) {
-  const mutation = useMutation({
-    mutationFn: RoomApi.leaveRoom,
-    onSuccess: () => {
-      options.onSuccess?.();
-    },
-  });
-  return mutation;
-}

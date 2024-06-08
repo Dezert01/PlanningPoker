@@ -1,6 +1,5 @@
 import { CurrentUser, UserHistory } from "@/model/user";
 import { api } from "./client";
-import { currentUserHistory, currentUserRes } from "@/api-mock-data/auth-data";
 
 export namespace UserApi {
   export const getCurrentUser = async () => {

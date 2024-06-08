@@ -1,13 +1,12 @@
 "use client";
 import Deck from "@/app/room/[roomId]/deck";
 import {
-  roomKeys,
-  useJoinRoomMutation,
   useRoomDetailsQuery,
 } from "@/queries/room.queries";
 import React, { useEffect, useState, useCallback } from "react";
 import * as signalR from "@microsoft/signalr";
-import Participants, { TParticipant } from "./participants";
+import Participants from "./participants";
+import { TParticipant } from "@/model/room";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 

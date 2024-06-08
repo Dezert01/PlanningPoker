@@ -23,7 +23,7 @@ export function useListUserStoriesQuery(roomId: number) {
   return query;
 }
 
-export function useGettUserStoryDetailsQuery(userStoryId: number) {
+export function useGetUserStoryDetailsQuery(userStoryId: number) {
   const query = useQuery({
     queryKey: userStoryKeys.userStory(userStoryId),
     queryFn: () => UserStoryApi.getUserStoryDetails(userStoryId),

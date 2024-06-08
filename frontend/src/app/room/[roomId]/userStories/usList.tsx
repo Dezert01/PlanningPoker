@@ -43,10 +43,6 @@ const UsList: React.FC<Props> = ({
 }) => {
   const { data, isLoading, isError, error } = useListUserStoriesQuery(roomId);
 
-  const handleclick = () => {
-    createUserStoryHandle("New User Story", "New Description");
-  };
-
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
@@ -59,7 +55,6 @@ const UsList: React.FC<Props> = ({
   return (
     <>
       <CreateUsDialog addUserStoryHandle={addUserStoryHandle} />
-      {/* <Button onClick={handleclick}>Create New User Story</Button> */}
       <ScrollArea className="h-full">
         <div className="flex flex-col gap-4">
           {data?.map((el) => (

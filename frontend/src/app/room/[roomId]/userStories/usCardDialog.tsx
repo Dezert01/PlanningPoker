@@ -72,12 +72,9 @@ const UsCardDialog: React.FC<Props> = ({
         taskTitleRef.current.value,
         taskDescRef.current.value,
       );
-      console.log("Task added");
-      setTimeout(() => {
         queryClient.invalidateQueries({
-          queryKey: userStoryKeys.userStory(data.id),
+          queryKey: userStoryKeys.userStories(roomId),
         });
-      }, 1000);
     }
   };
 
@@ -185,8 +182,10 @@ const UsCardDialog: React.FC<Props> = ({
             <Button
               variant="destructive"
               onClick={() => {
-                deleteUserStoryHandle(data.id);
-                setIsOpen(false);
+                if (window.confirm("Are you sure you want to delete this?")) {
+                  deleteUserStoryHandle(data.id);
+                  setIsOpen(false);
+                }
               }}
             >
               Delete

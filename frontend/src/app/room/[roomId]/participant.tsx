@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { TParticipant } from "./participants";
+import { TParticipant } from "@/model/room";
 
 type Props = {
   data: TParticipant;

@@ -1,8 +1,6 @@
-import { Participant, VOTING_SYSTEM } from "@/model/user";
+import { VOTING_SYSTEM } from "@/model/user";
 import { api } from "./client";
 import { Room } from "@/model/room";
-//import { rooms } from "@/api-mock-data/room-data";
-import { TParticipant } from "@/app/room/[roomId]/participants";
 
 export namespace RoomApi {
   export const getRooms = async () => {
@@ -28,27 +26,6 @@ export namespace RoomApi {
   export const createRoom = async (params: CreateRoomReq) => {
     const res = await api.post<CreateRoomRes>("/rooms/create", params);
     return res.data;
-  };
-
-  interface JoinRoomRes {
-    roomId: number;
-  }
-
-  export const joinRoom = async (data: {
-    roomId: number;
-    nickname: string;
-  }) => {
-    const roomId = data.roomId;
-    const nickname = data.nickname;
-    // const res = await api.post<JoinRoomRes>(`/room/${roomId}/join`);
-    // return res.data;
-    return { roomId, nickname };
-  };
-
-  export const leaveRoom = async (roomId: number) => {
-    // const res = await api.delete(`/room/${roomId}/leave`);
-    // return res.data;
-    return { roomId };
   };
 
   export const getParticipants = async (roomId: number) => {

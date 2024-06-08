@@ -1,10 +1,5 @@
 import Participant from "./participant";
-
-// TODO: move to model
-export type TParticipant = {
-  name: string;
-  value: boolean | string;
-};
+import { TParticipant } from "@/model/room";
 
 type Props = {
   participants: TParticipant[];
