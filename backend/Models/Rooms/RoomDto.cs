@@ -14,5 +14,6 @@ namespace PlanningPoker.Models.Rooms
 
         //[JsonConverter(typeof(JsonStringEnumConverter))]
         public string VotingSystem { get; set; } // todo: enum
+        public string GameState { get; set; }
     }
 }

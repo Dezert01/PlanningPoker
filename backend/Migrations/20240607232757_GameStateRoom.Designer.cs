@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PlanningPoker.Persistence;
@@ -11,9 +12,11 @@ using PlanningPoker.Persistence;
 namespace PlanningPoker.Migrations
 {
     [DbContext(typeof(PlanningPokerDbContext))]
-    partial class PlanningPokerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240607232757_GameStateRoom")]
+    partial class GameStateRoom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,9 +46,6 @@ namespace PlanningPoker.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("RoomId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Vote")
@@ -137,10 +137,6 @@ namespace PlanningPoker.Migrations
 
                     b.Property<int>("UserStoryId")
                         .HasColumnType("integer");
-
-                    b.Property<int[]>("VotersIds")
-                        .IsRequired()
-                        .HasColumnType("integer[]");
 
                     b.HasKey("Id");
 

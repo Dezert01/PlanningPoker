@@ -1,4 +1,4 @@
-import { RoomHistory, VOTING_SYSTEM } from "@/model/user";
+import { UserHistory, VOTING_SYSTEM } from "@/model/user";
 import { userStories } from "./userstory-data";
 
 export const loginRes = {
@@ -19,7 +19,7 @@ export const currentUserRes = {
   email: "johndoe@gmail.com",
 };
 
-export const currentUserHistory: RoomHistory[] = [
+export const currentUserHistory: UserHistory[] = [
   {
     createdAt: new Date(),
     id: 1,

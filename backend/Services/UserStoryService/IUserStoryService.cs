@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PlanningPoker.Models.Participants;
+﻿using PlanningPoker.Models.Participants;
 using PlanningPoker.Models.Rooms;
 using PlanningPoker.Models.UserStory;
 
@@ -25,6 +24,6 @@ namespace PlanningPoker.Services.UserStoryService
 
         Task<string> EstimateTaskValue(int userStoryTaskId, IList<VotingResults> votingResults, VotingSystem votingSystem);
         Task<UserStoryTask?> GetUserStoryTaskById(int userStoryTaskId);
-
+        Task SaveVoters(int userStoryTaskId, IList<Participant> voters);
     }
 }

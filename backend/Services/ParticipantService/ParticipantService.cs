@@ -37,9 +37,9 @@ namespace PlanningPoker.Services.ParticipantService
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task CreateParticipant(int roomId, string participantName, string connectionId, bool isOwner)
+        public async Task CreateParticipant(int roomId, string participantName, string connectionId, int? userId, bool isOwner)
         {
-            var participant = new Participant(roomId, participantName, connectionId, isOwner);
+            var participant = new Participant(roomId, participantName, connectionId, userId, isOwner);
             await _dbContext.Participants.AddAsync(participant);
             await _dbContext.SaveChangesAsync();
         }

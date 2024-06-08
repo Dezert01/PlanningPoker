@@ -9,13 +9,14 @@ namespace PlanningPoker.Models.Participants
 
         }
 
-        public Participant(int roomId, string name, string connectionId, bool isOwner = false)
+        public Participant(int roomId, string name, string connectionId, int? userId, bool isOwner = false)
         {
             Name = name ?? "";
             Role = isOwner ? ParticipantRole.Owner : ParticipantRole.Base;
             // Status = ParticipantStatus.Active;
             ConnectionId = connectionId;
             RoomId = roomId;
+            UserId = userId;
         }
 
         public int Id { get; set; }
@@ -26,5 +27,6 @@ namespace PlanningPoker.Models.Participants
         public string? Vote { get; set; }
         public string ConnectionId { get; set; }
         public int RoomId { get; set; }
+        public int? UserId { get; set; }
     }
 }

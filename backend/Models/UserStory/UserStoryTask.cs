@@ -27,6 +27,7 @@
         public string Description { get; set; }
         public string EstimationResult { get; set; }
         public int UserStoryId { get; set; }
+        public IList<int> VotersIds { get; set; }
 
         public string ToCsvString()
         {

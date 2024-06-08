@@ -9,5 +9,7 @@ namespace PlanningPoker.Services.UserService
         Task<SignUpResult> CreateUser(SignUpRequest request);
         Task<SignInResult> GetUserId(SignInRequest request);
         Task<User?> GetUser(int userId);
+        Task<string> GetUsername(int? userId);
+        Task<IList<UserHistory>> GetUserHistory(int userId);
     }
 }

@@ -20,6 +20,9 @@ namespace PlanningPoker.Models.Rooms
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public VotingSystem VotingSystem { get; set; }
 
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public RoomGameState GameState { get; set; }
+
         public IList<UserStory.UserStory> UserStories { get; set; }
 
     }

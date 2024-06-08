@@ -17,7 +17,7 @@ import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import UsTask from "./room/[roomId]/userStories/usTask";
 import { useQueryClient } from "@tanstack/react-query";
 import { userStoryKeys } from "@/queries/userstory.queries";
-import { RoomHistory } from "@/model/user";
+import { UserHistory } from "@/model/user";
 
 type Props = {
   data: UserStory;

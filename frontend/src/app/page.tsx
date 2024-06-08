@@ -70,14 +70,14 @@ export default function Home() {
         {user?.username} history of the estimation sessions
       </h1>
       <div className="w-full">
-        {data.map((room) => (
-          <div className="w-full flex-row pb-8" key={room.id}>
-            <h2>{room.name}</h2>
+        {data.map((userHistory) => (
+          <div className="w-full flex-row pb-8" key={userHistory.roomId}>
+            <h2>{userHistory.roomName}</h2>
             <p className="mb-4 text-lg font-semibold">
-              Voting System: {room.votingSystem}
+              Voting System: {userHistory.roomVotingSystem}
             </p>
             <ul className="flex flex-row flex-wrap gap-8">
-              {room.userStories.map((story) => (
+              {userHistory.userStories.map((story) => (
                 <li
                   key={story.id}
                   className="flex w-full max-w-md flex-col justify-between rounded-lg bg-gray-200 p-4"
@@ -99,7 +99,7 @@ export default function Home() {
                       ))}
                     </ul>
                   </div>
-                  <HistoryDialog data={story} roomId={room.id} />
+                  <HistoryDialog data={story} roomId={userHistory.roomId} />
                 </li>
               ))}
             </ul>

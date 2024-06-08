@@ -319,6 +319,20 @@ namespace PlanningPoker.Services.UserStoryService
             return await _dbContext.UserStoryTasks.FindAsync(userStoryTaskId);
         }
 
+        public async Task SaveVoters(int userStoryTaskId, IList<Participant> voters)
+        {
+            var task = await GetUserStoryTaskById(userStoryTaskId);
+
+            if (task == null)
+                throw new Exception("Task not found.");
+
+            var ids= voters.Where(v => v.UserId != null).Select(p => p.UserId!.Value).ToList();
+
+            task.VotersIds = ids;
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task<string> EstimateTaskValue(int userStoryTaskId, IList<VotingResults> votingResults, VotingSystem votingSystem)
         {
             var estimation = EvaluateResults(votingResults, votingSystem);

@@ -29,6 +29,10 @@ namespace PlanningPoker.Persistence
                 .HasConversion<string>();
 
             modelBuilder.Entity<Room>()
+                .Property(r => r.GameState)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Room>()
                 .HasMany(r => r.Participants)
                 .WithOne()
                 .HasForeignKey(p => p.RoomId);

@@ -25,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { addListItem } from "@/queries/query.utils";
 import { userStoryKeys } from "@/queries/userstory.queries";
 import { config } from "@/config";
+import { RoomGameState } from "@/model/room";
 
 export default function Room({
   params,
@@ -43,7 +44,8 @@ export default function Room({
       .build(),
   );
 
-  const [gameState, setGameState] = useState<string>("");
+  const [gameState, setGameState] = useState<RoomGameState>('GameReady');
+  const [readyToFinish, setReadyToFinish] = useState(false);
 
   // TODO: filter participants - wywalić siebie jesli jest przekazywany
   const [participants, setParticipants] = useState<TParticipant[]>([]);
@@ -85,12 +87,24 @@ export default function Room({
         router.push("/rooms");
       });
 
+      connection.on("VoteInProgress", async () => {
+        router.push("/rooms");
+      });
+
       connection.on("UserJoined", async (participantName) => {
         console.log(`${participantName} joined the room!`);
       });
 
+      connection.on("ParticipantName", async (participantName) => {
+        setUserNickname(participantName);
+      });
+
       connection.on("UserLeft", async (participantName) => {
         console.log(`${participantName} left the room.`);
+      });
+
+      connection.on("GameState", async (gameState) => {
+        setGameState(gameState);
       });
 
       connection.on("VoteSubmitted", async (participantName) => {
@@ -103,9 +117,7 @@ export default function Room({
 
       connection.on("EveryoneVoted", async (bool) => {
         console.log(`Voting ready to finish: ${bool}.`);
-        if (bool) {
-          setGameState("finished");
-        }
+        setReadyToFinish(bool);
       });
 
       connection.on("VotingState", async (votingState) => {
@@ -186,7 +198,8 @@ export default function Room({
 
       await connection.start();
 
-      await connection.invoke("JoinRoom", roomId, userNickname);
+      const userId = localStorage.getItem("userId");
+      await connection.invoke("JoinRoom", roomId, !!userId ? Number(userId) : null);
     } catch (error) {
       console.error("SignalR Connection Error:", error);
     }
@@ -199,6 +212,11 @@ export default function Room({
   useEffect(() => {
     return () => {
       if (connection) {
+        connection.off("NoRoomInRoom");
+        connection.off("VoteInProgress");
+        connection.off("GameState");
+        connection.off("ParticipantName");
+
         connection.off("UserJoined");
         connection.off("UserLeft");
         connection.off("VoteSubmitted");
@@ -401,7 +419,7 @@ export default function Room({
         )}
       </div>
 
-      {votedTask !== null && (
+      {votedTask !== null && gameState !== 'VoteFinished' && (
         <div>
           <h2>Your deck</h2>
           <Deck

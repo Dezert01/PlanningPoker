@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using PlanningPoker.Models.Participants;
 using PlanningPoker.Models.Rooms;
 using PlanningPoker.Models.UserStory;
 using PlanningPoker.Services.ParticipantService;
 using PlanningPoker.Services.RoomService;
+using PlanningPoker.Services.UserService;
 using PlanningPoker.Services.UserStoryService;
 
 namespace PlanningPoker.SignalR.Hubs
@@ -12,18 +14,21 @@ namespace PlanningPoker.SignalR.Hubs
         private readonly IRoomService _roomService;
         private readonly IParticipantService _participantService;
         private readonly IUserStoryService _userStoryService;
+        private readonly IUserService _userService;
 
         public RoomHub(
             IRoomService roomService,
             IParticipantService participantService,
-            IUserStoryService userStoryService)
+            IUserStoryService userStoryService,
+            IUserService userService)
         {
             _roomService = roomService;
             _participantService = participantService;
             _userStoryService = userStoryService;
+            _userService = userService;
         }
 
-        public async Task JoinRoom(int roomId, string participantName)
+        public async Task JoinRoom(int roomId, int? userId)
         {
             var room = await _roomService.GetRoomById(roomId);
 
@@ -36,7 +41,15 @@ namespace PlanningPoker.SignalR.Hubs
                 return;
             }
 
-            await _roomService.Join(room, participantName, Context.ConnectionId);
+            if (room.GameState == RoomGameState.VoteInProgress)
+            {
+                await Clients.Caller.SendAsync("VoteInProgress");
+                return;
+            }
+
+            var participantName = await _userService.GetUsername(userId);
+
+            await _roomService.Join(room, participantName, Context.ConnectionId, userId);
 
             var groupName = GetGroupName(room);
 
@@ -44,6 +57,7 @@ namespace PlanningPoker.SignalR.Hubs
             await Clients.Group(groupName).SendAsync("UserJoined", participantName);
             await Clients.Group(groupName).SendAsync("EveryoneVoted", false);
             await Clients.Caller.SendAsync("RoomDetails", room);
+            await Clients.Caller.SendAsync("ParticipantName", participantName);
 
             var votingState = _roomService.GetVotingState(room);
             await Clients.Group(groupName).SendAsync("VotingState", votingState);
@@ -73,9 +87,12 @@ namespace PlanningPoker.SignalR.Hubs
 
             if (await IsVotingFinished(roomId))
             {
+                await _roomService.SetGameState(roomId, RoomGameState.VoteFinished);
+
                 var votingResults = _roomService.GetVotingResults(room);
 
                 var estimation = await _userStoryService.EstimateTaskValue(userStoryTaskId, votingResults, room.VotingSystem);
+                await _userStoryService.SaveVoters(userStoryTaskId, room.Participants);
 
                 if (string.IsNullOrEmpty(estimation))
                     throw new Exception("Task estimation failed");
@@ -115,7 +132,10 @@ namespace PlanningPoker.SignalR.Hubs
             var groupName = GetGroupName(room);
 
             if (success)
+            {
                 await Clients.Group(groupName).SendAsync("UserStoryAdded", await _userStoryService.ListUserStories(room.Id));
+                await ResetGame(room);
+            }
 
             else
                 await Clients.Caller.SendAsync("CreatingUserStoryFailed");
@@ -131,7 +151,10 @@ namespace PlanningPoker.SignalR.Hubs
             var success = await _userStoryService.UpdateUserStory(roomId, userStoryId, name, description);
 
             if (success)
+            {
                 await Clients.Group(GetGroupName(room)).SendAsync("UserStoryUpdated", await _userStoryService.ListUserStories(room.Id));
+                await ResetGame(room);
+            }
 
             else
                 await Clients.Caller.SendAsync("UpdatingUserStoryFailed");
@@ -147,7 +170,10 @@ namespace PlanningPoker.SignalR.Hubs
             var success = await _userStoryService.DeleteUserStory(roomId, userStoryId);
 
             if (success)
+            {
                 await Clients.Group(GetGroupName(room)).SendAsync("UserStoryDeleted", await _userStoryService.ListUserStories(room.Id));
+                await ResetGame(room);
+            }
 
             else
                 await Clients.Caller.SendAsync("DeletingUserStoryFailed");
@@ -164,7 +190,10 @@ namespace PlanningPoker.SignalR.Hubs
             var success = await _userStoryService.CreateUserStoryTask(task);
 
             if (success)
+            {
                 await Clients.Group(GetGroupName(room)).SendAsync("UserStoryTaskCreated", await _userStoryService.ListUserStories(room.Id));
+                await ResetGame(room);
+            }
 
             else
                 await Clients.Caller.SendAsync("CreatingUserStoryTaskFailed");
@@ -180,7 +209,10 @@ namespace PlanningPoker.SignalR.Hubs
             var success = await _userStoryService.UpdateUserStoryTask(userStoryTaskId, title, description);
 
             if (success)
+            {
                 await Clients.Group(GetGroupName(room)).SendAsync("UserStoryTaskUpdated", await _userStoryService.ListUserStories(room.Id));
+                await ResetGame(room);
+            }
 
             else
                 await Clients.Caller.SendAsync("UpdatingUserStoryTaskFailed");
@@ -196,7 +228,10 @@ namespace PlanningPoker.SignalR.Hubs
             var success = await _userStoryService.DeleteUserStoryTask(userStoryTaskId);
 
             if (success)
+            {
                 await Clients.Group(GetGroupName(room)).SendAsync("UserStoryTaskDeleted", await _userStoryService.ListUserStories(room.Id));
+                await ResetGame(room);
+            }
 
             else
                 await Clients.Caller.SendAsync("DeletingUserStoryTaskFailed");
@@ -213,17 +248,39 @@ namespace PlanningPoker.SignalR.Hubs
             if (userStoryTask == null)
                 throw new Exception("No task with given ID");
 
+            await _roomService.SetGameState(roomId, RoomGameState.VoteInProgress);
             var groupName = GetGroupName(room);
 
+            await Clients.Group(groupName).SendAsync("GameState", RoomGameState.VoteInProgress);
             await Clients.Group(groupName).SendAsync("VotingStart", userStoryTask);
 
+            await ResetPlayerVotes(room);
+        }
 
-            // TODO: Do better
+        private async Task ResetGame(Room room)
+        {
+            await _roomService.SetGameState(room.Id, RoomGameState.GameReady);
+
+            var groupName = GetGroupName(room);
+
+            await ResetPlayerVotes(room);
+
+            await Clients.Group(groupName).SendAsync("GameState", RoomGameState.GameReady);
+            await Clients.Group(groupName).SendAsync("VotingStart", null);
+        }
+
+        private async Task ResetPlayerVotes(Room room)
+        {
+            var groupName = GetGroupName(room);
+            var votingState = _roomService.GetVotingState(room);
+
             foreach (var participant in room.Participants)
             {
                 await _participantService.SubmitVote(participant.Name, participant.ConnectionId, null);
-                await Clients.Group(groupName).SendAsync("VoteWithdrawn", participant.Name);
             }
+
+            await Clients.Group(groupName).SendAsync("VotingState", votingState);
+
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -235,6 +292,7 @@ namespace PlanningPoker.SignalR.Hubs
                 var room = await _roomService.GetRoomById(participant.RoomId);
                 if (room != null)
                 {
+                    await ResetGame(room);
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGroupName(room));
                     await Clients.Group(GetGroupName(room)).SendAsync("UserLeft", participant.Name);
 

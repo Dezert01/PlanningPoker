@@ -34,7 +34,7 @@ export const RoomCard = ({ room }: RoomCardProps) => {
       <Button
         className="ml-auto items-end justify-end self-end"
         onClick={onJoinButtonPress}
-        disabled={room.occupancy >= room.capacity}
+        disabled={room.occupancy >= room.capacity || room.gameState === 'VoteInProgress'}
       >
         Join room
       </Button>

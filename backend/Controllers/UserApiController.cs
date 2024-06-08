@@ -36,7 +36,15 @@ namespace PlanningPoker.Controllers
         [HttpGet("{userId}/history")]
         public async Task<IActionResult> GetUserHistory([FromRoute] int userId)
         {
-            return Ok();
+            if (userId == null)
+                return Empty;
+
+            var history = await _userService.GetUserHistory(userId);
+
+            if (history.Count == 0)
+                return NoContent();
+
+            return Ok(history);
         }
 
     }

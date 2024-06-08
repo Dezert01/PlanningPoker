@@ -84,12 +84,12 @@ namespace PlanningPoker.Services.RoomService
             return room.Id;
         }
 
-        public async Task<bool> Join(Room room, string participantName, string connectionId)
+        public async Task<bool> Join(Room room, string participantName, string connectionId, int? userId)
         {
             var existingParticipant = room.Participants.FirstOrDefault(p => p.Name == participantName);
 
             if (existingParticipant == null)
-                await _participantService.CreateParticipant(room.Id, participantName, connectionId, room.Participants.Count == 0);
+                await _participantService.CreateParticipant(room.Id, participantName, connectionId, userId, room.Participants.Count == 0);
             else    
                 await _participantService.UpdateParticipant(existingParticipant, connectionId);
 
@@ -116,5 +116,25 @@ namespace PlanningPoker.Services.RoomService
             return room.Participants.OrderBy(p => p.Id).Select(participant => new VotingResults(participant.Name, participant.Vote!)).ToList();
         }
 
+        public async Task SetGameState(int roomId, RoomGameState gameState)
+        {
+            var room = await GetRoomById(roomId);
+
+            if (room == null)
+                throw new Exception("Room not found.");
+
+            room.GameState = gameState;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<RoomGameState> GetGameState(int roomId)
+        {
+            var room = await GetRoomById(roomId);
+
+            if (room == null)
+                throw new Exception("Room not found.");
+
+            return room.GameState;
+        }
     }
 }

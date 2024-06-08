@@ -8,4 +8,7 @@ export interface Room {
   owner?: Participant | null;
   occupancy: number;
   votingSystem: VOTING_SYSTEM;
+  gameState: RoomGameState;
 }
+
+export type RoomGameState = 'GameReady' | 'VoteInProgress' | 'VoteFinished';

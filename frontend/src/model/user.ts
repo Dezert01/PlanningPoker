@@ -31,10 +31,9 @@ export interface CurrentUser {
   email: string;
 }
 
-export interface RoomHistory {
+export interface UserHistory {
   roomId: number;
   roomName: string;
-  createdAt: Date;
-  votingSystem: VOTING_SYSTEM;
+  roomVotingSystem: VOTING_SYSTEM;
   userStories: UserStory[];
 }

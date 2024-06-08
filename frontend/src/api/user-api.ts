@@ -1,4 +1,4 @@
-import { CurrentUser, RoomHistory } from "@/model/user";
+import { CurrentUser, UserHistory } from "@/model/user";
 import { api } from "./client";
 import { currentUserHistory, currentUserRes } from "@/api-mock-data/auth-data";
 
@@ -13,8 +13,9 @@ export namespace UserApi {
 
   export const getCurrentUserHistory = async () => {
     const userId = localStorage.getItem("userId");
-    // const res = await api.get<RoomHistory[]>(`user/${userId}/history`);
-    const res = { data: currentUserHistory };
+    console.log('userHistory');
+    const res = await api.get<UserHistory[]>(`user/${userId}/history`);
+    // const res = { data: currentUserHistory };
     return res.data;
   };
 }
