@@ -1,12 +1,12 @@
 "use client";
 import Deck from "@/app/room/[roomId]/deck";
 import {
+  roomKeys,
   useJoinRoomMutation,
   useRoomDetailsQuery,
 } from "@/queries/room.queries";
 import React, { useEffect, useState, useCallback } from "react";
 import * as signalR from "@microsoft/signalr";
-import NicknameForm from "./nicknameForm";
 import Participants, { TParticipant } from "./participants";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -19,10 +19,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import UsList from "./userStories/usList";
-import { UserStoryApi } from "@/api/userstory-api";
-import { UserStory, UserStoryTask } from "@/model/userstory";
+import { UserStoryTask } from "@/model/userstory";
 import { useQueryClient } from "@tanstack/react-query";
-import { addListItem } from "@/queries/query.utils";
 import { userStoryKeys } from "@/queries/userstory.queries";
 import { config } from "@/config";
 import { RoomGameState } from "@/model/room";
@@ -36,6 +34,10 @@ export default function Room({
 }) {
   const queryClient = useQueryClient();
   const roomId = Number(params.roomId);
+  let userId = null;
+  if (typeof window !== 'undefined') {
+    userId = localStorage.getItem('userId');
+  }
   const [isCopied, setIsCopied] = useState(false);
   const [userNickname, setUserNickname] = useState<string | null>(null);
   const [connection, setConnection] = useState(() =>
@@ -43,14 +45,8 @@ export default function Room({
       .withUrl(`${config.baseUrl}/roomHub`)
       .build(),
   );
-
   const [gameState, setGameState] = useState<RoomGameState>("GameReady");
-  const [readyToFinish, setReadyToFinish] = useState(false);
-
-  // TODO: filter participants - wywalić siebie jesli jest przekazywany
   const [participants, setParticipants] = useState<TParticipant[]>([]);
-  const [userStories, setUserStories] = useState<UserStory[]>([]);
-
   const [votedTask, setVotedTask] = useState<UserStoryTask | null>(null);
   const [votedTaskEstimation, setVotedTaskEstimation] = useState<string | null>(
     null,
@@ -59,167 +55,69 @@ export default function Room({
 
   const router = useRouter();
 
-  const joinRoomMutation = useJoinRoomMutation({
-    onSuccess: () => {
-      console.log("Joined room");
-    },
-    onError: () => {
-      console.log("Error joining room");
-    },
-  });
-
-  const handleSetNickname = (nickname: string) => {
-    setUserNickname(nickname);
-    if (userNickname) {
-      joinRoomMutation.mutate({
-        roomId: roomId,
-        nickname: userNickname,
-      });
-    }
-  };
-
   const startConnection = useCallback(async () => {
-    if (!userNickname) return;
     setVotedTask(null);
-    try {
-      console.log("SignalR Connected");
-
-      connection.on("NoRoomInRoom", async () => {
-        router.push("/rooms");
-      });
-
-      connection.on("VoteInProgress", async () => {
-        router.push("/rooms");
-      });
-
-      connection.on("UserJoined", async (participantName) => {
-        console.log(`${participantName} joined the room!`);
-      });
-
-      connection.on("ParticipantName", async (participantName) => {
-        console.log("participantName:", participantName);
-        setUserNickname(participantName);
-        // handleSetNickname(participantName);
-      });
-
-      connection.on("UserLeft", async (participantName) => {
-        console.log(`${participantName} left the room.`);
-      });
-
-      connection.on("GameState", async (gameState) => {
-        setGameState(gameState);
-      });
-
-      connection.on("VoteSubmitted", async (participantName) => {
-        console.log(`${participantName} submitted vote.`);
-      });
-
-      connection.on("VoteWithdrawn", async (participantName) => {
-        console.log(`${participantName} withdrawn their vote.`);
-      });
-
-      connection.on("EveryoneVoted", async (bool) => {
-        console.log(`Voting ready to finish: ${bool}.`);
-        setReadyToFinish(bool);
-      });
-
-      connection.on("VotingState", async (votingState: TParticipant[]) => {
-        console.log("votingstate:", votingState);
-        setParticipants(votingState);
-        const value = votingState.find((el) => el.name === userNickname)?.value;
-        console.log(value);
-        if (!value) {
-          setCurrentChoice(null);
+    connection.stop().then(() => {
+      try {
+        connection.on("NoRoomInRoom", async () => {
+          router.push("/rooms");
+        });
+  
+        connection.on("VoteInProgress", async () => {
+          router.push("/rooms");
+        });
+  
+        connection.on("ParticipantName", async (participantName) => {
+          setUserNickname(participantName);
+        });
+  
+        connection.on("GameState", async (gameState) => {
+          setGameState(gameState);
+        });
+  
+        connection.on("VotingState", async (votingState: TParticipant[]) => {
+          setParticipants(votingState);
+          const value = votingState.find((el) => el.name === userNickname)?.value;
+          if (!value) {
+            setCurrentChoice(null);
+          }
+        });
+  
+        connection.on("VotingResults", async (votingResults) => {
+          console.log(votingResults);
+          setParticipants(votingResults);
+        });
+  
+        connection.on("VotingStart", async (task) => {
+          setVotedTask(task);
+          setVotedTaskEstimation(null);
+        });
+  
+        connection.on("TaskEstimation", async (taskEstimation) => {
+          setVotedTaskEstimation(taskEstimation);
+          await submitVoteHandle(null);
+        });
+  
+        if (connection.state === signalR.HubConnectionState.Disconnected) {
+          connection.start().then(() => {
+            connection.invoke(
+              "JoinRoom",
+              roomId,
+              !!userId ? Number(userId) : null,
+            );
+          });  
         }
-        console.log("connection:", connection);
-      });
 
-      connection.on("VotingResults", async (votingResults) => {
-        console.log(votingResults);
-        setParticipants(votingResults);
-      });
-
-      connection.on("UserStoryAdded", async (userStories) => {
-        setUserStories(userStories);
-      });
-
-      connection.on("CreatingUserStoryFailed", async (userStories) => {
-        // todo: wyświetlić alert o błędzie
-        console.log("Creating user story failed");
-      });
-
-      // todo: przyciski do edycji i usuwania user story
-      connection.on("UserStoryUpdated", async (userStories) => {
-        setUserStories(userStories);
-      });
-
-      connection.on("UpdatingUserStoryFailed", async () => {
-        // todo: wyświetlić alert o błędzie
-        console.log("Updating user story failed");
-      });
-
-      connection.on("UserStoryDeleted", async (userStories) => {
-        setUserStories(userStories);
-      });
-
-      connection.on("DeletingUserStoryFailed", async () => {
-        // todo: wyświetlić alert o błędzie
-        console.log("Deleting user story failed");
-      });
-
-      connection.on("UserStoryTaskCreated", async (userStories) => {
-        setUserStories(userStories);
-      });
-
-      connection.on("CreatingUserStoryTaskFailed", async () => {
-        // todo: wyświetlić alert o błędzie
-        console.log("Creating user story task failed");
-      });
-
-      connection.on("UserStoryTaskUpdated", async (userStories) => {
-        setUserStories(userStories);
-      });
-
-      connection.on("UpdatingUserStoryTaskFailed", async () => {
-        // todo: wyświetlić alert o błędzie
-        console.log("Updating user story task failed");
-      });
-
-      connection.on("UserStoryTaskDeleted", async (userStories) => {
-        setUserStories(userStories);
-      });
-
-      connection.on("DeletingUserStoryTaskFailed", async () => {
-        // todo: wyświetlić alert o błędzie
-        console.log("Deleting user story task failed");
-      });
-
-      connection.on("VotingStart", async (task) => {
-        setVotedTask(task);
-        setVotedTaskEstimation(null);
-      });
-
-      connection.on("TaskEstimation", async (taskEstimation) => {
-        setVotedTaskEstimation(taskEstimation);
-        await submitVoteHandle(null);
-      });
-
-      await connection.start();
-
-      const userId = localStorage.getItem("userId");
-      await connection.invoke(
-        "JoinRoom",
-        roomId,
-        !!userId ? Number(userId) : null,
-      );
-    } catch (error) {
-      console.error("SignalR Connection Error:", error);
-    }
-  }, [connection, roomId, router, userNickname]);
+      } catch (error) {
+        console.error("SignalR Connection Error:", error);
+      }
+    })
+  }, []);
 
   useEffect(() => {
     startConnection();
   }, [startConnection]);
+
 
   useEffect(() => {
     return () => {
@@ -317,13 +215,18 @@ export default function Room({
     description: string,
   ) => {
     if (!connection) return;
+    console.log("Creating task");
     await connection.invoke(
       "CreateUserStoryTask",
       roomId,
       userStoryId,
       title,
       description,
-    );
+    ).then((res) => {
+      console.log("Task created SUCCESS", res);
+    }).catch((error) => {
+      console.error("Task creation error", error);
+    });
   };
 
   const updateUserStoryTaskHandle = async (
@@ -352,10 +255,6 @@ export default function Room({
     await connection.invoke("SetVotedTask", roomId, task.id);
   };
 
-  if (!userNickname) {
-    return <NicknameForm setNickname={handleSetNickname} />;
-  }
-
   if (isLoading) {
     return <h1>Loading...</h1>;
   }
@@ -366,7 +265,6 @@ export default function Room({
     return <h1>No room</h1>;
   }
 
-  // todo: pokazywanie wyników po wciśnięciu przycisku
   return (
     <div className="relative">
       <div className="mb-4 flex items-center justify-between border-b-2 border-white pb-4">
@@ -443,10 +341,6 @@ export default function Room({
           />
         </div>
       )}
-
-      {/* <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button disabled={gameState != 'finished'} className="mt-5">Lock Voting</Button>
-      </div> */}
     </div>
   );
 }

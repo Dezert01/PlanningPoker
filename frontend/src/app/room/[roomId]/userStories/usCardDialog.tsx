@@ -72,11 +72,12 @@ const UsCardDialog: React.FC<Props> = ({
         taskTitleRef.current.value,
         taskDescRef.current.value,
       );
+      console.log("Task added");
       setTimeout(() => {
         queryClient.invalidateQueries({
           queryKey: userStoryKeys.userStory(data.id),
         });
-      }, 500);
+      }, 1000);
     }
   };
 

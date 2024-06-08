@@ -93,6 +93,9 @@ export default function Login() {
               Register
             </Button>
           </Link>
+          <Link href="/">
+            <p className="mb-2 text-center text-white/70 mt-8">Continue as guest</p>
+          </Link>
         </div>
       </div>
     </div>

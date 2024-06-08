@@ -36,5 +36,5 @@ export interface UserHistory {
   roomCreatedAt: Date;
   roomName: string;
   roomVotingSystem: VOTING_SYSTEM;
-  userStories: UserStory[];
+  roomUserStories: UserStory[];
 }

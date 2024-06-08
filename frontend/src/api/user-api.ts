@@ -7,15 +7,12 @@ export namespace UserApi {
     const userId = localStorage.getItem("userId");
     const res = await api.get<CurrentUser>(`user/${userId}`);
     console.log(res);
-    // const res = { data: currentUserRes };
     return res.data;
   };
 
   export const getCurrentUserHistory = async () => {
     const userId = localStorage.getItem("userId");
-    console.log('userHistory');
     const res = await api.get<UserHistory[]>(`user/${userId}/history`);
-    // const res = { data: currentUserHistory };
     return res.data;
   };
 }

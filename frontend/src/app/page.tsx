@@ -22,38 +22,14 @@ export default function Home() {
   const getCurrentUser = useCallback(async () => {
     if (userId) {
       const res = await UserApi.getCurrentUser();
-      console.log('res', res);
       setUser(res);
-    } else {
-      router.push("/login");
-    }
-  }, [router, setUser, userId]);
+    } 
+  }, [setUser, userId]);
 
   useEffect(() => {
     getCurrentUser();
   }, [getCurrentUser]);
 
-  if (isLoading || !userId) {
-    return (
-      <div>
-        <h1>Loading...</h1>
-      </div>
-    );
-  }
-  if (isError) {
-    return (
-      <div>
-        <h1>Error: {error.message}</h1>
-      </div>
-    );
-  }
-  if (!data) {
-    return (
-      <div>
-        <h1>No user data found</h1>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -66,46 +42,52 @@ export default function Home() {
           <Button>Create new room</Button>
         </Link>
       </div>
-      <h1 className="mb-4 mt-48 text-center">
-        {user?.username} history of the estimation sessions
-      </h1>
-      <div className="w-full">
-        {data.map((userHistory) => (
-          <div className="w-full flex-row pb-8" key={userHistory.roomId}>
-            <h2>{userHistory.roomName}</h2>
-            <p className="mb-4 text-lg font-semibold">
-              Voting System: {userHistory.roomVotingSystem}
-            </p>
-            <ul className="flex flex-row flex-wrap gap-8">
-              {userHistory.userStories.map((story) => (
-                <li
-                  key={story.id}
-                  className="flex w-full max-w-md flex-col justify-between rounded-lg bg-gray-200 p-4"
-                >
-                  <div className="mb-8">
-                    <h3 className="font-bold text-black">{story.title}</h3>
-                    <p className="font-semibold text-black">
-                      {story.description}
-                    </p>
-                    <ul className="mt-4 flex flex-col">
-                      {story.tasks.slice(0, 2).map((task) => (
-                        <li key={task.id}>
-                          <h4 className="text-black">{task.title}</h4>
-                          <p className="text-black">{task.description}</p>
-                          <p className="font-semibold text-black">
-                            Voting result: {task.votingResult}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <HistoryDialog data={story} roomId={userHistory.roomId} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      {userId && (
+         <div className="w-full mt-48">
+         {!isLoading && !isError && <h1 className="mb-4 text-center">
+           {user?.username} history of the estimation sessions
+         </h1>}
+         {isLoading ? <h1 className="text-center text-xl text-white/70">Loading...</h1> : 
+         isError ? <h1 className="text-center text-xl text-red">Error: {error.message}</h1> :
+         (!data) ? <h1 className="text-center text-xl text-white/70">User history is empty</h1> :
+         data.map((userHistory) => (
+           <div className="w-full flex-row pb-8" key={userHistory.roomId}>
+             <h2>{userHistory.roomName}</h2>
+             <p className="mb-4 text-lg font-semibold">
+               Voting System: {userHistory.roomVotingSystem}
+             </p>
+             <ul className="flex flex-row flex-wrap gap-8">
+               {userHistory.roomUserStories.map((story) => (
+                 <li
+                   key={story.id}
+                   className="flex w-full max-w-md flex-col justify-between rounded-lg bg-gray-200 p-4"
+                 >
+                   <div className="mb-8">
+                     <h3 className="font-bold text-black">{story.title}</h3>
+                     <p className="font-semibold text-black">
+                       {story.description}
+                     </p>
+                     <ul className="mt-4 flex flex-col">
+                       {story.tasks.slice(0, 2).map((task) => (
+                         <li key={task.id}>
+                           <h4 className="text-black">{task.title}</h4>
+                           <p className="text-black">{task.description}</p>
+                           <p className="font-semibold text-black">
+                             Voting result: {task.estimationResult}
+                           </p>
+                         </li>
+                       ))}
+                     </ul>
+                   </div>
+                   <HistoryDialog data={story} roomId={userHistory.roomId} />
+                 </li>
+               ))}
+             </ul>
+           </div>
+         ))}
+       </div>
+      )}
+     
     </>
   );
 }

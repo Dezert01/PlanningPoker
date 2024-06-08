@@ -2,9 +2,14 @@
 
 import { RoomCard } from "@/app/rooms/roomCard";
 import { useRoomsListQuery } from "@/queries/room.queries";
+import { useEffect } from "react";
 
 export default function Rooms() {
-  const { data, isLoading, isError, error } = useRoomsListQuery();
+  const { data, isLoading, isError, error, refetch} = useRoomsListQuery();
+
+  useEffect(() => {
+    refetch();
+  })
 
   if (isLoading) {
     return (

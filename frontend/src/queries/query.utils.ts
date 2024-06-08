@@ -1,9 +1,9 @@
 import { QueryClient } from "@tanstack/react-query";
 
-export function updateListItem<T extends { id: string }>(
+export function updateListItem<T extends { id: number }>(
   queryClient: QueryClient,
   key: string[],
-  itemId: string,
+  itemId: number,
   fields: Partial<T> | ((oldData: T) => T),
 ) {
   queryClient.setQueryData<T[]>(key, (oldData) => {

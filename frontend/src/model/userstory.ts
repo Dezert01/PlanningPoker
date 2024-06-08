@@ -10,5 +10,5 @@ export interface UserStoryTask {
   id: number;
   title: string;
   description: string;
-  votingResult: string;
+  estimationResult: string;
 }

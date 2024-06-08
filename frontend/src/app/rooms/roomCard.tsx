@@ -11,7 +11,6 @@ export const RoomCard = ({ room }: RoomCardProps) => {
   const router = useRouter();
 
   const onJoinButtonPress = () => {
-    
     router.push(`/room/${room.id}`);
   };
 
