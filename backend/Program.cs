@@ -20,15 +20,10 @@ namespace PlanningPoker
                 options.AddPolicy(name: myAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:3000")
+                        policy.WithOrigins("https://planningpokerinf1337.vercel.app", "https://localhost:3000", "http://localhost:3000")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();
-
-                        //policy.WithOrigins("http://*", "https://*", "https://planningpokerinf1337-kkonefelds-projects.vercel.app", "https://planningpokerinf1337-kkonefelds-projects.vercel.app/*", "https://planningpokerinf1337-kkonefelds-projects.vercel.app/rooms")
-                        //    .AllowAnyMethod()
-                        //    .AllowAnyHeader()
-                        //    .AllowCredentials();
                     });
             });
 

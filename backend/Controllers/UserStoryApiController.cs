@@ -5,11 +5,11 @@ namespace PlanningPoker.Controllers
 {
     [Route("api/user-stories")]
     [ApiController]
-    public class UserStoryController : ControllerBase
+    public class UserStoryApiController : ControllerBase
     {
         private readonly IUserStoryService _userStoryService;
 
-        public UserStoryController(IUserStoryService userStoryService)
+        public UserStoryApiController(IUserStoryService userStoryService)
         {
             _userStoryService = userStoryService;
         }
