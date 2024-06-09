@@ -48,7 +48,11 @@ export default function Register() {
 
   const signUpMutation = useSignUpMutation({
     onSuccess: (res) => {
-      router.push("/");
+      if (res) {
+        router.push("/");
+      } else {
+        alert("Invalid credentials");
+      }
     },
     onError: (e) => {
       alert(e.message);

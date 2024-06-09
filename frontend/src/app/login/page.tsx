@@ -30,7 +30,11 @@ export default function Login() {
 
   const signInMutation = useSignInMutation({
     onSuccess: (res) => {
-      router.push("/");
+      if (res.status) {
+        router.push("/");
+      } else {
+        alert(res.message);
+      }
     },
     onError: (e) => {
       alert(e.message);
@@ -87,14 +91,18 @@ export default function Login() {
           </form>
         </Form>
         <div className="mt-16">
-          <p className="mb-2 text-center font-medium">Don&apos;t have an account?</p>
+          <p className="mb-2 text-center font-medium">
+            Don&apos;t have an account?
+          </p>
           <Link href="/register">
             <Button type="button" className="w-full">
               Register
             </Button>
           </Link>
           <Link href="/">
-            <p className="mb-2 text-center text-white/70 mt-8">Continue as guest</p>
+            <p className="mb-2 mt-8 text-center text-white/70">
+              Continue as guest
+            </p>
           </Link>
         </div>
       </div>
